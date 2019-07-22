@@ -581,9 +581,10 @@ var GlobalConfig = {
     var currentFocusedElement = getCurrentFocusedElement();
 
     var silentFocus = function() {
-      if (currentFocusedElement) {
-        currentFocusedElement.blur();
-      }
+      //weird triple focus fix
+      // if (currentFocusedElement) {
+      //   currentFocusedElement.blur();
+      // }
       elem.focus();
       focusChanged(elem, sectionId);
     };
