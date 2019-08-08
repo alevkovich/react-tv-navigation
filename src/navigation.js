@@ -81,11 +81,13 @@ var GlobalConfig = {
   /*****************/
   function getRect(elem) {
     var cr = elem.getBoundingClientRect();
+    var layerMultiplierHack = elem.getAttribute('data-layer') || 1 // the dirtiest ahck in the world here !!!
+    layerMultiplierHack = layerMultiplierHack * 50
     var rect = {
         left: cr.left,
-        top: cr.top,
+        top: cr.top - layerMultiplierHack,
         right: cr.right,
-        bottom: cr.bottom,
+        bottom: cr.bottom - layerMultiplierHack,
         width: cr.width,
         height: cr.height
     };
