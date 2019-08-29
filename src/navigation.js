@@ -92,7 +92,8 @@ function getRect (elem) {
     bottom: cr.bottom,
     // bottom: cr.bottom - verticalLayerMultiplierHack,
     width: cr.width,
-    height: cr.height
+    height: cr.height,
+    parent: elem.parentElement
   }
   rect.element = elem
   rect.center = {
@@ -334,6 +335,7 @@ function navigate (target, direction, candidates, config) {
   }
 
   var soterdMinDistanceElements
+  var sameSectionElements
 
   if (['up', 'down'].indexOf(direction) > -1) {
     soterdMinDistanceElements = elements.map((el) => {
@@ -351,9 +353,15 @@ function navigate (target, direction, candidates, config) {
     })
   }
 
-  // next = elements[0].element
+  sameSectionElements = soterdMinDistanceElements.filter((el) => {
+    return el.parent === targetRect.parent
+  })
 
-  return soterdMinDistanceElements[0] ? soterdMinDistanceElements[0].element : target
+  return sameSectionElements.length
+    ? sameSectionElements[0].element
+    : soterdMinDistanceElements[0]
+      ? soterdMinDistanceElements[0].element
+      : target
 
   // ****************
 }
