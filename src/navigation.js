@@ -519,13 +519,14 @@ function focusElement (elem, sectionId, direction) {
   }
 
   var currentFocusedElement = getCurrentFocusedElement()
+  var preventScroll = elem.getAttribute('data-prevent-scroll') === 'true'
 
   var silentFocus = function () {
     //weird triple focus fix
     // if (currentFocusedElement) {
     //   currentFocusedElement.blur();
     // }
-    elem.focus()
+    elem.focus({ preventScroll })
     focusChanged(elem, sectionId)
   }
 
@@ -567,7 +568,7 @@ function focusElement (elem, sectionId, direction) {
     _duringFocusChange = false
     return false
   }
-  elem.focus()
+  elem.focus({ preventScroll })
   fireEvent(elem, 'focused', focusProperties, false)
 
   _duringFocusChange = false
@@ -873,7 +874,8 @@ function onBlur (evt) {
     if (!fireEvent(target, 'willunfocus', unfocusProperties)) {
       _duringFocusChange = true
       setTimeout(function () {
-        target.focus()
+        var preventScroll = target.getAttribute('data-prevent-scroll') === 'true'
+        target.focus({ preventScroll })
         _duringFocusChange = false
       })
     } else {
