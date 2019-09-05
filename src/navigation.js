@@ -288,6 +288,17 @@ const atBottom = (point1, point2, trashHold = 0) => {
   return point1.top - point2.top < -trashHold
 }
 
+const sortElementsByDistance = (targetRect, elements) => {
+  return elements.map((el) => {
+    return {
+      ...el,
+      distance: Math.hypot(el.left - targetRect.left, el.top - targetRect.top)
+    }
+  }).sort((a, b) => {
+    return a.distance - b.distance
+  })
+}
+
 function navigate (target, direction, candidates, config) {
   if (!target || !direction || !candidates || !candidates.length) {
     return null
@@ -337,33 +348,40 @@ function navigate (target, direction, candidates, config) {
   var soterdMinDistanceElements
   var sameSectionElements
 
-  if (['up', 'down'].indexOf(direction) > -1) {
-    soterdMinDistanceElements = elements.map((el) => {
-      return { ...el, distance: Math.hypot(el.left - targetRect.left, el.top - targetRect.top) }
-    }).sort((a, b) => {
-      return a.distance - b.distance
-    })
-  } else {
-    soterdMinDistanceElements = elements.filter((el) => {
-      return Math.abs(targetRect.top - el.top) < minDistanceTrashHold
-    }).map((el) => {
-      return { ...el, distance: Math.hypot(el.left - targetRect.left, el.top - targetRect.top) }
-    }).sort((a, b) => {
-      return a.distance - b.distance
-    })
+  switch (direction) {
+    case 'up':
+      const closestTopCoordinate = elements.length ? elements.sort((a, b) => b.top - a.top)[0].top : null
+      if (closestTopCoordinate) {
+        const closestTopCandidates = elements.filter((el) => closestTopCoordinate - el.top <= minDistanceTrashHold)
+        soterdMinDistanceElements = sortElementsByDistance(targetRect, closestTopCandidates)
+      }
+      break
+    case 'down':
+      const closestBottomCoordinate = elements.length ? elements.sort((a, b) => a.top - b.top)[0].top : null
+      if (closestBottomCoordinate) {
+        const closestBottomCandidates = elements.filter((el) => el.top - closestBottomCoordinate <= minDistanceTrashHold)
+        soterdMinDistanceElements = sortElementsByDistance(targetRect, closestBottomCandidates)
+      }
+      break
+    case 'left':
+    case 'right':
+      const closestHorisontalCandidates = elements.filter((el) => Math.abs(targetRect.top - el.top) < minDistanceTrashHold)
+      soterdMinDistanceElements = sortElementsByDistance(targetRect, closestHorisontalCandidates)
   }
 
-  sameSectionElements = soterdMinDistanceElements.filter((el) => {
-    return el.parent === targetRect.parent
-  })
+  if (soterdMinDistanceElements) {
+    sameSectionElements = soterdMinDistanceElements.filter((el) => {
+      return el.parent === targetRect.parent
+    })
 
-  return sameSectionElements.length
-    ? sameSectionElements[0].element
-    : soterdMinDistanceElements[0]
-      ? soterdMinDistanceElements[0].element
-      : target
-
-  // ****************
+    return sameSectionElements.length
+      ? sameSectionElements[0].element
+      : soterdMinDistanceElements[0]
+        ? soterdMinDistanceElements[0].element
+        : target
+  } else {
+    return target
+  }
 }
 
 /********************/
