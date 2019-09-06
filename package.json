@@ -1,6 +1,6 @@
 {
   "name": "react-tv-navigation",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Simple spatial anvigation with layers support",
   "main": "dist/bundle.umd.js",
   "files": [
