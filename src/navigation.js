@@ -308,6 +308,7 @@ function navigate (target, direction, candidates, config) {
 
   var targetRect = getRect(target)
   var targetLayer = target.getAttribute('data-layer') || 1
+  var freeNavigation = target.getAttribute('data-free-navigation')
 
   var leftElements = []
   var rightElements = []
@@ -350,23 +351,62 @@ function navigate (target, direction, candidates, config) {
 
   switch (direction) {
     case 'up':
-      const closestTopCoordinate = elements.length ? elements.sort((a, b) => b.top - a.top)[0].top : null
-      if (closestTopCoordinate) {
-        const closestTopCandidates = elements.filter((el) => closestTopCoordinate - el.top <= minDistanceTrashHold)
-        soterdMinDistanceElements = sortElementsByDistance(targetRect, closestTopCandidates)
+      const closestTopElements = elements.filter((rect) => {
+        return !(rect.right <= targetRect.left  || targetRect.right <= rect.left)
+      })
+
+      soterdMinDistanceElements = closestTopElements.sort((a, b) => {
+        return b.center.bottom - a.center.bottom
+      })
+
+      if (!soterdMinDistanceElements.length) {
+        const closestTopCoordinate = elements.length ? elements.sort((a, b) => b.top - a.top)[0].top : null
+        if (closestTopCoordinate) {
+          const closestTopCandidates = elements.filter((el) => closestTopCoordinate - el.top <= minDistanceTrashHold)
+          soterdMinDistanceElements = sortElementsByDistance(targetRect, closestTopCandidates)
+        }
       }
+
+      // console.log('=>>>>>>>>>>>>')
+      // console.log(target)
+      // soterdMinDistanceElements.map((rect) => console.log(rect.element))
       break
     case 'down':
-      const closestBottomCoordinate = elements.length ? elements.sort((a, b) => a.top - b.top)[0].top : null
-      if (closestBottomCoordinate) {
-        const closestBottomCandidates = elements.filter((el) => el.top - closestBottomCoordinate <= minDistanceTrashHold)
-        soterdMinDistanceElements = sortElementsByDistance(targetRect, closestBottomCandidates)
+      const closestBottomElements = elements.filter((rect) => {
+        return !(rect.right <= targetRect.left  || targetRect.right <= rect.left)
+      })
+
+      soterdMinDistanceElements = closestBottomElements.sort((a, b) => {
+        return a.center.top - b.center.top
+      })
+
+      if (!soterdMinDistanceElements.length && freeNavigation) {
+        const closestBottomCoordinate = elements.length ? elements.sort((a, b) => a.top - b.top)[0].top : null
+        if (closestBottomCoordinate) {
+          const closestBottomCandidates = elements.filter((el) => el.top - closestBottomCoordinate <= minDistanceTrashHold)
+          soterdMinDistanceElements = sortElementsByDistance(targetRect, closestBottomCandidates)
+        }
       }
+
+      // console.log('=>>>>>>>>>>>>')
+      // console.log(target)
+      // soterdMinDistanceElements.map((rect) => console.log(rect.element))
       break
     case 'left':
     case 'right':
-      const closestHorisontalCandidates = elements.filter((el) => Math.abs(targetRect.top - el.top) < minDistanceTrashHold)
+      const closestHorisontalCandidates = elements.filter((rect) => {
+        return !(rect.bottom <= targetRect.top || targetRect.bottom <= rect.top)
+      })
+
       soterdMinDistanceElements = sortElementsByDistance(targetRect, closestHorisontalCandidates)
+
+      if (freeNavigation) {
+
+      }
+
+    // console.log('=>>>>>>>>>>>>')
+    // console.log(target)
+    // soterdMinDistanceElements.map((rect) => console.log(rect.element))
   }
 
   if (soterdMinDistanceElements) {
