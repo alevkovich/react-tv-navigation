@@ -348,6 +348,7 @@ function navigate (target, direction, candidates, config) {
 
   var soterdMinDistanceElements
   var sameSectionElements
+  let sameRowElements = []
 
   switch (direction) {
     case 'up':
@@ -358,6 +359,12 @@ function navigate (target, direction, candidates, config) {
       soterdMinDistanceElements = closestTopElements.sort((a, b) => {
         return b.center.bottom - a.center.bottom
       })
+
+      sameRowElements = soterdMinDistanceElements.length ? soterdMinDistanceElements.filter((rect) => {
+        return rect.top === soterdMinDistanceElements[0].top
+      }) : []
+
+      soterdMinDistanceElements = sortElementsByDistance(targetRect, sameRowElements)
 
       if (!soterdMinDistanceElements.length) {
         const closestTopCoordinate = elements.length ? elements.sort((a, b) => b.top - a.top)[0].top : null
@@ -379,6 +386,12 @@ function navigate (target, direction, candidates, config) {
       soterdMinDistanceElements = closestBottomElements.sort((a, b) => {
         return a.center.top - b.center.top
       })
+
+      sameRowElements = soterdMinDistanceElements.length ? soterdMinDistanceElements.filter((rect) => {
+        return rect.top === soterdMinDistanceElements[0].top
+      }) : []
+
+      soterdMinDistanceElements = sortElementsByDistance(targetRect, sameRowElements)
 
       if (!soterdMinDistanceElements.length && freeNavigation) {
         const closestBottomCoordinate = elements.length ? elements.sort((a, b) => a.top - b.top)[0].top : null
